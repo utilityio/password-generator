@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Strong Password Generator – genera password sicure istantaneamente">
+  <title>Strong Password Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f5f5f5; }
+    .container { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    label, button { display: block; margin-top: 1rem; }
+    input, button { padding: 0.5rem; font-size: 1rem; }
+    #password { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Strong Password Generator</h1>
+    <label for="length">Lunghezza password (8-32):</label>
+    <input type="number" id="length" value="16" min="8" max="32">
+
+    <label><input type="checkbox" id="includeLower" checked> Lettere minuscole</label>
+    <label><input type="checkbox" id="includeUpper" checked> Lettere maiuscole</label>
+    <label><input type="checkbox" id="includeNumbers" checked> Numeri</label>
+    <label><input type="checkbox" id="includeSymbols" checked> Simboli</label>
+
+    <button id="generateBtn">Genera Password</button>
+    <div id="password"></div>
+  </div>
+
+  <script>
+    function generatePassword(length, options) {
+      const { lower, upper, number, symbol } = options;
+      const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+      const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const numberChars = '0123456789';
+      const symbolChars = '!@#$%^&*()_+~`|}{[]\\:;?><,./-=';
+      let charset = '';
+      if (lower) charset += lowerChars;
+      if (upper) charset += upperChars;
+      if (number) charset += numberChars;
+      if (symbol) charset += symbolChars;
+      if (!charset) return '';
+      let password = '';
+      const array = new Uint32Array(length);
+      window.crypto.getRandomValues(array);
+      for (let i = 0; i < length; i++) {
+        password += charset[array[i] % charset.length];
+      }
+      return password;
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const length = parseInt(document.getElementById('length').value, 10);
+      const options = {
+        lower: document.getElementById('includeLower').checked,
+        upper: document.getElementById('includeUpper').checked,
+        number: document.getElementById('includeNumbers').checked,
+        symbol: document.getElementById('includeSymbols').checked
+      };
+      const pwd = generatePassword(length, options);
+      const pwdDiv = document.getElementById('password');
+      pwdDiv.textContent = pwd;
+      navigator.clipboard.writeText(pwd).catch(() => {});
+    });
+  </script>
+</body>
+</html>
+
+<!--
+Istruzioni di pubblicazione su GitHub Pages:
+1. Crea un repository su GitHub (es. `password-gen`).
+2. Clona il repo in locale o usa l'interfaccia web 'Add file' > 'Create new file'.
+3. Crea un file `index.html` e incolla questo contenuto.
+4. Vai su Impostazioni > Pages > Source: `main` branch / root directory > Salva.
+5. Dopo pochi minuti, la tua web-app sarà live su `https://<tuo-username>.github.io/password-gen/`.
+-->
